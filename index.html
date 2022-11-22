@@ -69,40 +69,68 @@
     </form>
 
     <section id="error-btns">
-      <button>Console Log</button>
-      <button>Console Error</button>
-      <button>Console Count</button>
-      <button>Console Warn</button>
-      <button>Console Assert</button>
-      <button>Console Clear</button>
-      <button>Console Dir</button>
-      <button>Console dirxml</button>
-      <button>Console Group Start</button>
-      <button>Console Group End</button>
-      <button>Console Table</button>
-      <button>Start Timer</button>
-      <button>End Timer</button>
-      <button>Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button onclick=console.log("log")>Console Log</button>
+      <button onclick=console.error("error")>Console Error</button>
+      <button onclick=console.count("count")>Console Count</button>
+      <button onclick=console.warn("warning")>Console Warn</button>
+      <button onclick=console.assert(1==0,"1!=0")>Console Assert</button>
+      <button onclick=console.clear()>Console Clear</button>
+      <button onclick=console.dir(document.head)>Console Dir</button>
+      <button onclick=console.dirxml(document.body)>Console dirxml</button>
+      <button onclick=console.group("group")>Console Group Start</button>
+      <button onclick=console.groupEnd("group")>Console Group End</button>
+      <button onclick=console.table([{A:"A"},{A:"B"},{A:"C"}])>Console Table</button>
+      <button onclick=console.time()>Start Timer</button>
+      <button onclick=console.timeEnd()>End Timer</button>
+      <button onclick=console.trace()>Console Trace</button>
+      <button onclick=ERROR>Trigger a Global Error</button>
     </section>
   </main>
 
   <script>
+    window.addEventListener("error", (event) => {
+      TrackJS.track(event);
+    });
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
-      let output = document.querySelector('output');
-      let firstNum = document.querySelector('#first-num').value;
-      let secondNum = document.querySelector('#second-num').value;
-      let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        let output = document.querySelector('output');
+        let firstNum = document.querySelector('#first-num').value;
+        let secondNum = document.querySelector('#second-num').value;
+        let operator = document.querySelector('#operator').value;
+        if(secondNum == "0" && operator == "/") {
+          output.innerHTML = "NaN";
+          throw new DivideByZeroError("Plz don't divide by 0...");
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        console.log("calculation ended!");
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
-
+  
     // Start your code here
     // You may move this JS to another file if you wish
+    class DivideByZeroError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "DivideByZeroError";
+      }
+    }
   </script>
+
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "24d23c6bd73b4c4689ce80cbec6d5a7d"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+                        
 </body>
 
 </html>
